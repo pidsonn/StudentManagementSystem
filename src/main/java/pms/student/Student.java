@@ -13,7 +13,7 @@ public class Student {
   
     
         //Default constructors
-    public Student(){}
+    public Student(int id2, String name2, int age2, String grade2){}
 
         //Constructors with parameters
     public Student( int age, String name, String grade)
@@ -58,6 +58,8 @@ public class Student {
         {
             return "ID:" + id + ", Name:" + name + ",Age:" + age + ",Grade:" + grade;
         }
+
+        
         
 
 } 

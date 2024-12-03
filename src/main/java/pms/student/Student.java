@@ -16,10 +16,11 @@ public class Student {
     public Student(){}
 
         //Constructors with parameters
-    public Student( int age, String name, String grade)
+    public Student( int id, String name,int age, String grade)
     {
-        this.age = age;
+        this.id = id;
         this.name = name;
+        this.age = age;
         this.grade = grade;
     }
             //Getters and Setters.
@@ -54,11 +55,13 @@ public class Student {
         {
             this.age = age;
         }
+        @Override
         public String toString()
         {
             return "ID:" + id + ", Name:" + name + ",Age:" + age + ",Grade:" + grade;
         }
-        
+
+       
 
 } 
     

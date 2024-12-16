@@ -1,6 +1,8 @@
 package pms.main;
 
 
+
+
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -70,7 +72,7 @@ public class StudentManagementSystem
                   case 8:
                     System.out.print("Enter the file name to load:");
                     String loadFile = console.next();
-                    sm.loadFromFile(loadFile);
+                    StudentManagement.loadFromFile(loadFile);
                     break;
 
 

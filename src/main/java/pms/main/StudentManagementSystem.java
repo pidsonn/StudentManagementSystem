@@ -19,7 +19,7 @@ public class StudentManagementSystem {
             System.out.println("3: Update student details.");
             System.out.println("4: Delete a student.");
             System.out.println("5: Search for a student.");
-            System.out.println("9: Exit program.");
+            
             System.out.print("Enter your selection: ");
 
             try {

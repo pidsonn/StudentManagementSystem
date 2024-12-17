@@ -1,160 +1,137 @@
 package pms.studentmanagement;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import pms.dao.DAO;
-import pms.db.DBConnection;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import pms.student.Student;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.io.IOException;
 
-public class StudentManagement implements DAO {
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
-    @Override
-    public boolean insertStudent(Student s) {
-        boolean flag = false;
 
-        try {
-            Connection con = DBConnection.createConnection();
-            String query = "INSERT INTO student (name, age, grade) VALUES (?, ?, ?)";
-            PreparedStatement pst = con.prepareStatement(query);
 
-            // Set the values for the parameters
-            pst.setString(1, s.getName());
-            pst.setInt(2, s.getAge());
-            pst.setString(3, s.getGrade());
 
-            pst.executeUpdate(); // Execute the query
-            flag = true;
-        } catch (Exception e) {
-            e.printStackTrace();
+public class StudentManagement  {
+    private static ArrayList<Student> students = new ArrayList<>();
+    
+                //default constructor
+        public StudentManagement(){
+            StudentManagement.students = new ArrayList<>();
         }
-        return flag;
-    }
-
-    @Override
-    public boolean delete(int id) {
-        boolean flag = false;
-
-        try {
-            Connection con = DBConnection.createConnection();
-            String query = "DELETE FROM student WHERE id = ?";
-            PreparedStatement pst = con.prepareStatement(query);
-
-            pst.setInt(1, id); // Set the ID parameter
-            int rowsAffected = pst.executeUpdate();
-
-            if (rowsAffected > 0) {
-                flag = true;
+               //sorting by name
+        public void sortByName(){
+            Collections.sort(students, Comparator.comparing(Student::getName));
+            System.out.println("students sorted by Name:");
+            displayStudents();
+    
+        }
+                //sorting by grade
+        public void sortByGrade(){
+            Collections.sort(students, Comparator.comparing(Student::getGrade));
+            System.out.println("students sorted by Grade");
+            displayStudents();
+        }
+             //Display All students
+        public void displayStudents(){
+            for(Student student: students){
+                System.out.println(student);
+                if(students.isEmpty()){
+                    System.out.println("No student records to display.");
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        return flag;
-    }
-
-    @Override
-    public void showAllStudents() {
-        try {
-            Connection con = DBConnection.createConnection();
-            String query = "SELECT * FROM student";
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-
-            while (rs.next()) {
-                System.out.println("Id: " + rs.getInt(1) +
-                                   "\nName: " + rs.getString(2) +
-                                   "\nAge: " + rs.getInt(3) +
-                                   "\nGrade: " + rs.getString(4));
-                System.out.println("-------------------------------");
+              // Add other methods like Add,Update,delete etc
+    
+    
+    
+    
+                //Save to file
+        public void saveToFile(String saveFile){
+           try(BufferedWriter Writer = new BufferedWriter(new FileWriter(saveFile))){
+             for(Student student:students){
+                Writer.write(student.getId()+","+student.getName()+","+student.getAge()+","+student.getGrade());
+                Writer.newLine();
+             }
+             System.out.println("Student records saved to" + saveFile);
+           }
+           catch(IOException e){
+            if(e.getMessage().contains("No such file or directory")){
+                System.out.println("Error: The specified path doesn't exist. Please provide a valid file path.");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            else{
+                System.out.println("Error saving to file:" + e.getMessage());
+    
+            }
         }
+             
+    
+           
+        }
+           //load from file
+           public static List<Student> loadFromFile(String loadFile) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(loadFile))) {
+                String line;
+                students.clear(); // Clear old records
+        
+                System.out.println("Attempting to load from file: " + loadFile);
+        
+                while ((line = reader.readLine()) != null) {
+                    System.out.println("Reading line: " + line);
+        
+                    String[] parts = line.split(",");
+                    System.out.println("Parsed parts: " + Arrays.toString(parts));
+        
+                    if (parts.length == 4) {
+                        try {
+                            int id = Integer.parseInt(parts[0]);
+                            String name = parts[1];
+                            int age = Integer.parseInt(parts[2]);
+                            String grade = parts[3];
+        
+                            students.add(new Student(id, name, age, grade));
+                            System.out.println("Student added: " + id + ", " + name + ", " + age + ", " + grade);
+
+                        } catch (NumberFormatException nfe) {
+                            System.out.println("Invalid student record: " + line);
+                            nfe.printStackTrace();
+                        }
+                    } else {
+                        System.out.println("Skipping invalid line: " + line);
+                    }
+                }
+                System.out.println("Student records loaded: " + students);
+            } catch (IOException e) {
+                System.out.println("Error loading from file: " + e.getMessage());
+            }
+            return students;
+        }
+        
+    public void addStudent(Student student) {
+        students.add(student);
     }
-
-    @Override
-public boolean update(int id, String update, int choice, Student s) {
-    boolean flag = false;
-
-    try {
-        Connection con = DBConnection.createConnection();
-        String query = "";
-
-        switch (choice) {
-            case 1: // Update name
-                query = "UPDATE student SET name = ? WHERE id = ?";
-                break;
-            case 2: // Update age
-                query = "UPDATE student SET age = ? WHERE id = ?";
-                break;
-            case 3: // Update grade
-                query = "UPDATE student SET grade = ? WHERE id = ?";
-                break;
-            default:
-                System.out.println("Invalid choice!");
-                return false;
-        }
-
-        PreparedStatement pst = con.prepareStatement(query);
-
-        // Set the parameter value based on choice
-        if (choice == 1) {
-            pst.setString(1, update); // Use the `update` parameter directly for name
-        } else if (choice == 2) {
-            pst.setInt(1, Integer.parseInt(update)); // Convert `update` to int for age
-        } else if (choice == 3) {
-            pst.setString(1, update); // Use the `update` parameter directly for grade
-        }
-
-        pst.setInt(2, id); // Set the ID
-        int rowsAffected = pst.executeUpdate();
-
-        if (rowsAffected > 0) {
-            System.out.println("Update successful!");
-            flag = true;
-        } else {
-            System.out.println("No record found with the given ID.");
-        }
-
-    } catch (NumberFormatException nfe) {
-        System.out.println("Invalid input for age. It must be a number.");
-        nfe.printStackTrace();
-    } catch (SQLException sqle) {
-        System.out.println("Database error. Please check your query and connection.");
-        sqle.printStackTrace();
-    } catch (Exception e) {
-        System.out.println("Something went wrong. Please try again.");
-        e.printStackTrace();
+    
+    
+    public List<Student> getStudents() {
+        // Return the list of students
+        return students;
     }
-
-    return flag;
+    public void clearStudents(){
+        // clear the students list
+      students.clear();
+    }
+    
+    
+    
+   
+    
 }
 
-    @Override
-    public boolean searchForStudent(int id) {
-        boolean flag = false;
-
-        try {
-            Connection con = DBConnection.createConnection();
-            String query = "SELECT * FROM student WHERE id = ?";
-            PreparedStatement pst = con.prepareStatement(query);
-
-            pst.setInt(1, id);
-            ResultSet rs = pst.executeQuery();
-
-            if (rs.next()) {
-                System.out.println("Id: " + rs.getInt(1) +
-                                   "\nName: " + rs.getString(2) +
-                                   "\nAge: " + rs.getInt(3) +
-                                   "\nGrade: " + rs.getString(4));
-                System.out.println("-------------------------------");
-                flag = true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return flag;
-    }
-}
+   
+ 
+   

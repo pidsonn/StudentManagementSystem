@@ -1,0 +1,5 @@
+src/main/java/db.properties
+# Ignore database credentials
+db.properties
+
+target/

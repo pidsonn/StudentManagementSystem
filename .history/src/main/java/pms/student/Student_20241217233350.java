@@ -21,8 +21,13 @@ public class Student {
         this.grade = "";  //default grade
     }
 
+<<<<<<< HEAD
+        //Constructors with parameters
+    public Student( int id, String name,int age, String grade)
+=======
         //Constructor with parameters
     public Student(int id, String name, int age, String grade)
+>>>>>>> main
     {
         this.id = id;
         this.name = name;
@@ -76,8 +81,12 @@ public class Student {
             return "ID:" + id + ", Name:" + name + ",Age:" + age + ",Grade:" + grade;
         }
 
+<<<<<<< HEAD
+       
+=======
         
         
+>>>>>>> main
 
 } 
     

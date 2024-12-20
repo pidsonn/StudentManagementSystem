@@ -1,5 +1,6 @@
 package pms.main;
 
+
 import java.util.InputMismatchException;
 
 
@@ -7,6 +8,7 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 
+import pms.student.Student;
 import pms.studentmanagement.StudentManagement;
 
 public class StudentManagementSystem {
@@ -29,13 +31,61 @@ public class StudentManagementSystem {
          System.out.println("9: Exit program.");
          System.out.print("Enter your selection: ");
 
-       try{
-         
-         int sel = console.nextInt();
-     
-         switch (sel) {
-            
-             case 6:
+         try {
+                int sel = console.nextInt();
+
+                switch (sel) {
+                    case 1:
+                        System.out.print("Enter student ID: ");
+                        int id = console.nextInt();
+                        System.out.print("Enter student name: ");
+                        String name = console.next();
+                        System.out.print("Enter student age: ");
+                        int age = console.nextInt();
+                        System.out.print("Enter student grade: ");
+                        String grade = console.next();
+
+                        sm.addStudent(new Student(id, name, age, grade));
+                        break;
+
+                    case 2:
+                        sm.displayStudents();
+                        break;
+
+                    case 3:
+                        System.out.print("Enter student ID to update: ");
+                        id = console.nextInt();
+                        System.out.println("\n1: Update name\n2: Update age\n3: Update grade");
+                        System.out.print("Enter your choice: ");
+                        int choice = console.nextInt();
+                        System.out.print("Enter new value: ");
+                        String newValue = console.next();
+
+                        if (sm.updateStudent(id, newValue, choice)) {
+                            System.out.println("Update successful!");
+                        } else {
+                            System.out.println("Student not found.");
+                        }
+                        break;
+
+                  case 7:
+                    System.out.print("Enter the file Name to save:");
+                    String saveFile = console.next();
+                    sm.saveToFile(saveFile);
+                    break;
+
+                    case 5:
+                        System.out.print("Enter student ID to search: ");
+                        id = console.nextInt();
+                        Student foundStudent = sm.searchStudent(id);
+                        if (foundStudent != null) {
+                            System.out.println("Student found: " + foundStudent);
+                        } else {
+                            System.out.println("Student not found.");
+                        }
+                        break;
+
+                case 6:
                   System.out.println("Sort students by:");
                   System.out.println("1: name");
                   System.out.println("2: Grade");
@@ -62,8 +112,9 @@ public class StudentManagementSystem {
                   case 8:
                     System.out.print("Enter the file name to load:");
                     String loadFile = console.next();
-                    StudentManagement.loadFromFile(loadFile);
+                    sm.loadFromFile(loadFile);
                     break;
+
 
 
                   case 9:

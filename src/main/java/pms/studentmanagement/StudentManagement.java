@@ -6,6 +6,42 @@ import java.util.Arrays;
 import pms.student.Student;
 import java.util.Collections;
 import java.util.Comparator;
+import java.io.IOException;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.FileReader;
+
+
+public class StudentManagement {
+    private ArrayList<Student> students = new ArrayList<>();
+
+    // Add a new student
+    public void addStudent(Student student) {
+        students.add(student);
+        System.out.println("Student added successfully!");
+    }
+      //default constructor
+    public StudentManagement(){
+        this.students = new ArrayList<>();
+    }
+           //sorting by name
+    public void sortByName(){
+        Collections.sort(students, Comparator.comparing(Student::getName));
+        System.out.println("students sorted by Name:");
+        displayStudents();
+    }
+
+    // Display all students
+    public void displayStudents() {
+        if (students.isEmpty()) {
+            System.out.println("No students to display.");
+        } else {
+            System.out.println("Student Records:");
+        }
+            for (Student student : students) {
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.io.IOException;
 
@@ -63,6 +99,18 @@ public class StudentManagement  {
            catch(IOException e){
             if(e.getMessage().contains("No such file or directory")){
                 System.out.println("Error: The specified path doesn't exist. Please provide a valid file path.");
+            }
+        
+    }
+
+    // Find and delete a student by ID
+    public boolean deleteStudent(int id) {
+        boolean removed = false;
+        for (Student student : students) {
+            if (student.getId() == id) {
+                students.remove(student);
+                removed = true;
+                break;
             }
             else{
                 System.out.println("Error saving to file:" + e.getMessage());

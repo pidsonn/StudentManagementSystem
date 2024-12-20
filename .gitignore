@@ -3,3 +3,6 @@ src/main/java/db.properties
 db.properties
 
 target/
+
+.history/
+target/

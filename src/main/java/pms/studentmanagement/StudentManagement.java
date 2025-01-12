@@ -1,185 +1,118 @@
 package pms.studentmanagement;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import pms.dao.DAO;
+import pms.db.DBConnection;
 import pms.student.Student;
-import java.util.Collections;
-import java.util.Comparator;
-import java.io.IOException;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.BufferedReader;
-import java.io.FileReader;
 
+public class StudentManagement implements DAO {
 
-public class StudentManagement {
-    private ArrayList<Student> students = new ArrayList<>();
-
-    // Add a new student
-    public void addStudent(Student student) {
-        students.add(student);
-        System.out.println("Student added successfully!");
-    }
-      //default constructor
-    public StudentManagement(){
-        this.students = new ArrayList<>();
-    }
-           //sorting by name
-    public void sortByName(){
-        Collections.sort(students, Comparator.comparing(Student::getName));
-        System.out.println("students sorted by Name:");
-        displayStudents();
+    @Override
+    public boolean insertStudent(Student s) {
+        boolean flag = false;
+        try {
+            Connection con = DBConnection.createConnection();
+            String query = "INSERT INTO student (sname, age, grade) VALUES (?, ?, ?)";
+            PreparedStatement pst = con.prepareStatement(query);
+            pst.setString(1, s.getName());
+            pst.setInt(2, s.getAge());
+            pst.setString(3, s.getGrade());
+            pst.executeUpdate();
+            flag = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return flag;
     }
 
-    // Display all students
-    public void displayStudents() {
-        if (students.isEmpty()) {
-            System.out.println("No students to display.");
-        } else {
-            System.out.println("Student Records:");
+    @Override
+    public boolean delete(int id) {
+        boolean flag = false;
+        try {
+            Connection con = DBConnection.createConnection();
+            String query = "DELETE FROM student WHERE id = ?";
+            PreparedStatement pst = con.prepareStatement(query);
+            pst.setInt(1, id);
+            int rowsAffected = pst.executeUpdate();
+            if (rowsAffected > 0) flag = true;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-            for (Student student : students) {
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.io.IOException;
+        return flag;
+    }
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.BufferedReader;
-import java.io.FileReader;
-
-
-
-
-public class StudentManagement  {
-    private static ArrayList<Student> students = new ArrayList<>();
-    
-                //default constructor
-        public StudentManagement(){
-            StudentManagement.students = new ArrayList<>();
-        }
-               //sorting by name
-        public void sortByName(){
-            Collections.sort(students, Comparator.comparing(Student::getName));
-            System.out.println("students sorted by Name:");
-            displayStudents();
-    
-        }
-                //sorting by grade
-        public void sortByGrade(){
-            Collections.sort(students, Comparator.comparing(Student::getGrade));
-            System.out.println("students sorted by Grade");
-            displayStudents();
-        }
-             //Display All students
-        public void displayStudents(){
-            for(Student student: students){
-                System.out.println(student);
-                if(students.isEmpty()){
-                    System.out.println("No student records to display.");
-                }
+    @Override
+    public void showAllStudents() {
+        try {
+            Connection con = DBConnection.createConnection();
+            String query = "SELECT * FROM student";
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                System.out.println("Id: " + rs.getInt(1)
+                        + "\nName: " + rs.getString(2)
+                        + "\nAge: " + rs.getInt(3)
+                        + "\nGrade: " + rs.getString(4));
+                System.out.println("-------------------------------");
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-              // Add other methods like Add,Update,delete etc
-    
-    
-    
-    
-                //Save to file
-        public void saveToFile(String saveFile){
-           try(BufferedWriter Writer = new BufferedWriter(new FileWriter(saveFile))){
-             for(Student student:students){
-                Writer.write(student.getId()+","+student.getName()+","+student.getAge()+","+student.getGrade());
-                Writer.newLine();
-             }
-             System.out.println("Student records saved to" + saveFile);
-           }
-           catch(IOException e){
-            if(e.getMessage().contains("No such file or directory")){
-                System.out.println("Error: The specified path doesn't exist. Please provide a valid file path.");
-            }
-        
     }
 
-    // Find and delete a student by ID
-    public boolean deleteStudent(int id) {
-        boolean removed = false;
-        for (Student student : students) {
-            if (student.getId() == id) {
-                students.remove(student);
-                removed = true;
-                break;
+    @Override
+    public boolean update(int id, String update, int choice, Student s) {
+        boolean flag = false;
+        try {
+            Connection con = DBConnection.createConnection();
+            String query = "";
+            if (choice == 1) { // Update name
+                query = "UPDATE student SET sname = ? WHERE id = ?";
+                PreparedStatement pst = con.prepareStatement(query);
+                pst.setString(1, s.getName());
+                pst.setInt(2, id);
+                flag = pst.executeUpdate() > 0;
+            } else if (choice == 2) { // Update age
+                query = "UPDATE student SET age = ? WHERE id = ?";
+                PreparedStatement pst = con.prepareStatement(query);
+                pst.setInt(1, s.getAge());
+                pst.setInt(2, id);
+                flag = pst.executeUpdate() > 0;
+            } else if (choice == 3) { // Update grade
+                query = "UPDATE student SET grade = ? WHERE id = ?";
+                PreparedStatement pst = con.prepareStatement(query);
+                pst.setString(1, s.getGrade());
+                pst.setInt(2, id);
+                flag = pst.executeUpdate() > 0;
             }
-            else{
-                System.out.println("Error saving to file:" + e.getMessage());
-    
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-             
-    
-           
-        }
-           //load from file
-           public static List<Student> loadFromFile(String loadFile) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(loadFile))) {
-                String line;
-                students.clear(); // Clear old records
-        
-                System.out.println("Attempting to load from file: " + loadFile);
-        
-                while ((line = reader.readLine()) != null) {
-                    System.out.println("Reading line: " + line);
-        
-                    String[] parts = line.split(",");
-                    System.out.println("Parsed parts: " + Arrays.toString(parts));
-        
-                    if (parts.length == 4) {
-                        try {
-                            int id = Integer.parseInt(parts[0]);
-                            String name = parts[1];
-                            int age = Integer.parseInt(parts[2]);
-                            String grade = parts[3];
-        
-                            students.add(new Student(id, name, age, grade));
-                            System.out.println("Student added: " + id + ", " + name + ", " + age + ", " + grade);
+        return flag;
+    }
 
-                        } catch (NumberFormatException nfe) {
-                            System.out.println("Invalid student record: " + line);
-                            nfe.printStackTrace();
-                        }
-                    } else {
-                        System.out.println("Skipping invalid line: " + line);
-                    }
-                }
-                System.out.println("Student records loaded: " + students);
-            } catch (IOException e) {
-                System.out.println("Error loading from file: " + e.getMessage());
+    @Override
+    public boolean showStudentById(int id) {
+        boolean flag = false;
+        try {
+            Connection con = DBConnection.createConnection();
+            String query = "SELECT * FROM student WHERE id = ?";
+            PreparedStatement pst = con.prepareStatement(query);
+            pst.setInt(1, id);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                System.out.println("Id: " + rs.getInt(1)
+                        + "\nName: " + rs.getString(2)
+                        + "\nAge: " + rs.getInt(3)
+                        + "\nGrade: " + rs.getString(4));
+                flag = true;
             }
-            return students;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        
-    public void addStudent(Student student) {
-        students.add(student);
+        return flag;
     }
-    
-    
-    public List<Student> getStudents() {
-        // Return the list of students
-        return students;
-    }
-    public void clearStudents(){
-        // clear the students list
-      students.clear();
-    }
-    
-    
-    
-   
-    
 }
-
-   
- 
-   

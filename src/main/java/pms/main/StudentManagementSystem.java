@@ -68,11 +68,15 @@ public class StudentManagementSystem {
                         }
                         break;
 
-                  case 7:
-                    System.out.print("Enter the file Name to save:");
-                    String saveFile = console.next();
-                    sm.saveToFile(saveFile);
-                    break;
+                  case 4:
+                        System.out.print("Enter student ID to delete: ");
+                        id = console.nextInt();
+                        if (sm.deleteStudent(id)) {
+                            System.out.println("Student deleted successfully!");
+                        } else {
+                            System.out.println("Student not found.");
+                        }
+                        break;
 
                     case 5:
                         System.out.print("Enter student ID to search: ");
